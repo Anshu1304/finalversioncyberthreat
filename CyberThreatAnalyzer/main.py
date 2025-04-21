@@ -179,6 +179,32 @@ def main():
                     data=data,
                     file_name=f"threat_analysis.{export_format}",
                     mime=f"text/{export_format}")
+     # Export section for Web Scraping (Live News)
+    if data_source == "Live News":
+        st.header("Export News Data")
+        export_format = st.selectbox("Export Format", ["csv", "json"],
+                                     key="news_export_format")
+        if st.button("Export News Data"):
+            db = Database()
+
+            # Update the method name to the correct one in the class
+            if export_format == "csv":
+                # Use export_web_scraping_analysis for CSV export
+                data = db.export_web_scraping_analysis(format="csv")
+                mime_type = "text/csv"
+                file_ext = "csv"
+            else:
+                # Use export_web_scraping_analysis for JSON export
+                data = db.export_web_scraping_analysis(format="json")
+                mime_type = "application/json"
+                file_ext = "json"
+
+            if data:
+                st.download_button(
+                    label=f"Download News Data ({export_format.upper()})",
+                    data=data,
+                    file_name=f"web_scraping_data.{file_ext}",
+                    mime=mime_type)
 
     if mode == "Source Comparison":
         st.header("Threat Source Comparison")
