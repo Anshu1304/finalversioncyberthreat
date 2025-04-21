@@ -19,6 +19,7 @@ class ThreatAnalysis(Base):
     response = Column(JSON, nullable=False)
     tags = Column(JSON, nullable=False)
 
+
 class WebScraping(Base):
     __tablename__ = 'web_scraping'
 
@@ -44,7 +45,7 @@ class Database:
             print(
                 "WARNING: DATABASE_URL not found. Using SQLite file database for testing."
             )
-            # Use a file-based SQLite database instead of in-memory
+
             self.engine = create_engine('sqlite:///threat_database.db')
 
             # Make sure the ThreatAnalysis table is created
@@ -141,19 +142,18 @@ class Database:
             'tags': analysis.tags
         }
 
-    def store_web_scraping_analysis(self, query, title, author, description, content, url, published_at, response):
+    def store_web_scraping_analysis(self, query, title, author, description,
+                                    content, url, published_at, response):
         session = self.Session()
         try:
-            analysis = WebScraping(
-                query=query,
-                title=title,
-                author=author,
-                description=description,
-                content=content,
-                url=url,
-                published_at=published_at,
-                response=response
-            )
+            analysis = WebScraping(query=query,
+                                   title=title,
+                                   author=author,
+                                   description=description,
+                                   content=content,
+                                   url=url,
+                                   published_at=published_at,
+                                   response=response)
             session.add(analysis)
             session.commit()
             return self._to_dict_web(analysis)
@@ -163,23 +163,42 @@ class Database:
         finally:
             session.close()
 
+    def export_web_scraping_analysis(self, format='csv'):
+        df = self.to_dataframe_web_scraping()
+        if format == 'csv':
+            return df.to_csv(index=False)
+        elif format == 'json':
+            return df.to_json(orient='records')
+        return None
+
     def _to_dict_web(self, analysis):
         return {
-            'timestamp': analysis.timestamp.isoformat(),
-            'query': analysis.query,
-            'title': analysis.title,
-            'author': analysis.author,
-            'description': analysis.description,
-            'content': analysis.content,
-            'url': analysis.url,
-            'published_at': analysis.published_at.isoformat() if analysis.published_at else None,
-            'response': analysis.response
+            'timestamp':
+            analysis.timestamp.isoformat(),
+            'query':
+            analysis.query,
+            'title':
+            analysis.title,
+            'author':
+            analysis.author,
+            'description':
+            analysis.description,
+            'content':
+            analysis.content,
+            'url':
+            analysis.url,
+            'published_at':
+            analysis.published_at.isoformat()
+            if analysis.published_at else None,
+            'response':
+            analysis.response
         }
 
     def to_dataframe_web_scraping(self):
         session = self.Session()
         try:
             analyses = session.query(WebScraping).all()
-            return pd.DataFrame([self._to_dict_web(analysis) for analysis in analyses])
+            return pd.DataFrame(
+                [self._to_dict_web(analysis) for analysis in analyses])
         finally:
             session.close()
