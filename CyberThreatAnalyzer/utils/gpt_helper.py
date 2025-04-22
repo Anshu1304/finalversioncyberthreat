@@ -24,12 +24,16 @@ class GPTHelper:
 
         print("Using OpenRouter API")
         # OpenRouter requires API key in Authorization header format
-        self.client = OpenAI(base_url="https://openrouter.ai/api/v1",
-                             api_key=self.openai_api_key,
-                             default_headers={
-                                 "HTTP-Referer": "https://replit.com/",
-                                 "X-Title": "Cyber Threat Analysis Platform"
-                             })
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.openai_api_key,
+            default_headers={
+                "Authorization": f"Bearer {self.openai_api_key}",  # REQUIRED
+                "HTTP-Referer": "https://replit.com/",  # OpenRouter requirement
+                "X-Title": "Cyber Threat Analysis Platform"  # Custom identifier
+                }
+                )
+
         # Set Gemma model for OpenRouter
         self.openai_model = "google/gemma-3-12b-it:free"
 
