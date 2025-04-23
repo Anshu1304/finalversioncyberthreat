@@ -7,7 +7,7 @@ class GPTHelper:
 
     def __init__(self):
         # Get API key from environment variable or prompt user if not found
-        self.openai_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.openai_api_key = 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
 
         # Debug output to verify API key
         if self.openai_api_key:
