@@ -1,11 +1,12 @@
 import os
 import json
 from openai import OpenAI
-
+from dotenv import load_dotenv 
 class GPTHelper:
     def __init__(self):
         # Get API key from environment variable
-        self.openai_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.openai_api_key = os.getenv("OPENROUTER_API_KEY")  # ← Changed to getenv()
+        self.db_name = os.getenv("DB_NAME")  # ← Added DB config
 
         # Debug output
         if self.openai_api_key:
