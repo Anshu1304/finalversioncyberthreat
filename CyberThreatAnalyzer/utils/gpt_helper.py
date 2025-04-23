@@ -1,37 +1,37 @@
 import os
 import json
 from openai import OpenAI
-from dotenv import load_dotenv 
-class GPTHelper:
-    def __init__(self):
-        # Get API key from environment variable
-        self.openai_api_key = os.getenv("OPENROUTER_API_KEY")  # ← Changed to getenv()
-        self.db_name = os.getenv("DB_NAME")  # ← Added DB config
 
-        # Debug output
+
+class GPTHelper:
+
+    def __init__(self):
+        # Get API key from environment variable or prompt user if not found
+        self.openai_api_key = os.environ.get("OPENROUTER_API_KEY")
+
+        # Debug output to verify API key
         if self.openai_api_key:
-            masked_key = self.openai_api_key[:4] + "..." + self.openai_api_key[-4:] if len(self.openai_api_key) > 8 else "***"
+            masked_key = self.openai_api_key[:4] + "..." + self.openai_api_key[
+                -4:] if len(self.openai_api_key) > 8 else "***"
             print(f"Found OpenRouter API key: {masked_key}")
         else:
             print("WARNING: No OpenRouter API key found. API calls will fail.")
-            print("Please set your OPENROUTER_API_KEY as an environment variable.")
+            print(
+                "Please set your OPENROUTER_API_KEY as an environment variable."
+            )
+            # Default key for initialization, but it won't work for actual API calls
             self.openai_api_key = "missing_key"
 
         print("Using OpenRouter API")
-        
-        # Corrected client initialization with proper headers
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=self.openai_api_key,  # Still required for client init
-            default_headers={
-                "Authorization": f"Bearer {self.openai_api_key}",  # REQUIRED FIX
-                "HTTP-Referer": "https://replit.com/",
-                "X-Title": "Cyber Threat Analysis Platform"
-            }
-        )
-        
+        # OpenRouter requires API key in Authorization header format
+        self.client = OpenAI(base_url="https://openrouter.ai/api/v1",
+                             api_key=self.openai_api_key,
+                             default_headers={
+                                 "HTTP-Referer": "https://replit.com/",
+                                 "X-Title": "Cyber Threat Analysis Platform"
+                             })
+        # Set Gemma model for OpenRouter
         self.openai_model = "google/gemma-3-12b-it:free"
- 
 
     def _send_request(self, prompt):
         if not self.openai_api_key or self.openai_api_key == "missing_key":
